@@ -15,6 +15,7 @@
   --box-shadow: 0 2px 6px rgba(var(--gray), 25%),
     0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%);
   --bg-body: #fff;
+  --bg-cards: #fff;
 }
 
 .dark {
@@ -27,6 +28,7 @@
   --gray-light: 20, 25, 35; /* dark bg */
   --gray-dark: 200, 210, 220; /* light text */
   --bg-body: rgb(20, 25, 35);
+  --bg-cards: rgb(30, 35, 45);
 
   --gray-gradient: #111, #1a1a1a;
   --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.5),
