@@ -1,16 +1,220 @@
 ---
-title: 'First post'
-description: 'Lorem ipsum dolor sit amet'
-pubDate: 'Jul 08 2022'
-heroImage: '../../assets/blog-placeholder-3.jpg'
+title: "Пишем свой Redux"
+description: "разбираем магию стейт-менеджеров"
+pubDate: "Dec 12 2025"
+heroImage: "../../assets/blog-placeholder-3.jpg"
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+Мы все привыкли использовать готовые инструменты: Redux Toolkit, Zustand, MobX. Мы пишем useStore, и магия происходит сама собой: данные обновляются, компоненты перерисовываются. Но что на самом деле происходит внутри этого «черного ящика»?
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+Многие разработчики боятся заглянуть под капот. Кажется, что там сложная математика и магия вуду. На самом деле, сердце любой такой библиотеки держится на трех простых концепциях: Замыкания, Паттерн Наблюдатель (Observer) и один специальный хук React.
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+Сегодня мы с нуля напишем свой стейт-менеджер. Мы начнем с "наивной" версии на чистом JS, набьем шишки на оптимизации рендеров и придем к тому же решению, которое используют создатели Redux и Zustand.
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+### Акт 1: Сердце на чистом JS
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+Прежде чем трогать React, давайте создадим само хранилище. По сути, нам нужно место, где лежат данные, и способ узнать, что они изменились.
+
+Нам понадобятся три элемента:
+
+- State (Состояние) — защищенная переменная с данными.
+- Subscribers (Подписчики) — список функций, которые нужно вызвать, когда данные изменятся.
+- Methods (Методы) — API для чтения, изменения и подписки.
+- Вот как это выглядит на ванильном JavaScript:
+
+```js
+function createStore(initialState) {
+  // 1. Скрытое состояние (благодаря замыканию оно недоступно снаружи напрямую)
+  let state = initialState;
+
+  // 2. Список слушателей. Используем Set, чтобы функции не дублировались
+  const listeners = new Set();
+
+  return {
+    // Получить актуальные данные
+    getState: () => state,
+
+    // Обновить данные и оповестить всех подписчиков
+    setState: (newState) => {
+      state = { ...state, ...newState }; // Иммутабельное обновление
+      listeners.forEach((listener) => listener(state)); // "Эй, данные изменились!"
+    },
+
+    // Подписаться на обновления
+    subscribe: (listener) => {
+      listeners.add(listener);
+      // Возвращаем функцию отписки (cleanup)
+      return () => listeners.delete(listener);
+    },
+  };
+}
+```
+
+Всего 20 строк кода. Мы используем замыкание, чтобы спрятать state, и паттерн Observer для реактивности.
+
+Давайте проверим:
+
+```js
+const store = createStore({ count: 0 });
+
+store.subscribe((state) => console.log("New state:", state));
+
+store.setState({ count: 1 });
+// Консоль: New state: { count: 1 }
+```
+
+Работает! Но React об этом пока ничего не знает.
+
+### Акт 2: Первая попытка «поженить» Store и React
+
+Чтобы React перерисовал компонент, нужно изменить его внутреннее состояние. Самый простой способ — использовать useState.
+
+Давайте напишем хук useStore, который подписывается на наш стор и синхронизирует его с локальным стейтом компонента.
+
+```js
+import { useState, useEffect } from "react";
+
+function useStore(store) {
+  const [state, setState] = useState(store.getState());
+
+  useEffect(() => {
+    // Подписываемся на стор
+    const unsubscribe = store.subscribe((newState) => {
+      // Когда стор обновился, обновляем стейт компонента -> вызывает ререндер
+      setState(newState);
+    });
+
+    // Не забываем отписаться при размонтировании
+    return () => unsubscribe();
+  }, [store]);
+
+  return state;
+}
+```
+
+В чем проблема этого решения?
+Представьте, что у нас в сторе много данных: { count: 0, user: 'Alex', theme: 'dark' }. А в компоненте мы используем только счетчик:
+
+```js
+const { count } = useStore(store);
+```
+
+Если где-то в другом месте изменится user, наш стор создаст новый объект состояния. Хук useStore увидит новый объект, вызовет setState, и наш компонент перерисуется, хотя count не изменился.
+
+В больших приложениях это убийца производительности.
+
+### Акт 3: Оптимизация и боль
+
+Чтобы избежать лишних рендеров, нам нужны Селекторы — функции, которые выбирают только нужный кусочек данных.
+
+Мы хотим писать так:
+
+```js
+const count = useStore((state) => state.count);
+```
+
+Если мы попробуем реализовать это вручную через useEffect, мы столкнемся с целым ворохом проблем:
+
+Лишние рендеры: Нам нужно сравнивать предыдущий результат селектора с новым.
+
+Протухшие замыкания (Stale Closures): Если селектор зависит от пропсов компонента, useEffect может запомнить старую версию функции.
+
+Tearing (Разрывы): В новых версиях React (Concurrent Mode) состояние может измениться прямо во время рендера, и пользователь увидит несогласованный интерфейс.
+
+Мы могли бы написать сложную логику с useRef для хранения текущего селектора и ручного сравнения данных, но... зачем?
+
+### Акт 4: Рояль в кустах — useSyncExternalStore
+
+Команда React знала об этих болях. В React 18 появился хук, созданный специально для таких библиотек, как наша — useSyncExternalStore.
+
+Он делает всё: подписывается, проверяет изменения, избегает тиринга и лишних рендеров.
+
+Вот как выглядит наш финальный, профессиональный хук:
+
+```js
+import { useSyncExternalStore, useCallback } from "react";
+
+function useStore(selector) {
+  return useSyncExternalStore(
+    store.subscribe, // Функция подписки
+    // Функция получения снимка данных.
+    // Оборачиваем в useCallback, чтобы создавать селектор только при необходимости
+    useCallback(() => selector(store.getState()), [selector])
+  );
+}
+```
+
+Важный нюанс: Стабильность селекторов
+Здесь есть подводный камень. Если вы используете селектор так:
+
+```js
+// ❌ Плохо
+const count = useStore((state) => state.count);
+```
+
+...то при каждом рендере создается новая функция. useSyncExternalStore видит новую функцию getSnapshot и переподписывается заново. Это очень дорого.
+
+Как правильно? Выносите селекторы за пределы компонента!
+
+```js
+// ✅ Хорошо
+const selectCount = (state) => state.count;
+
+const Counter = () => {
+  const count = useStore(selectCount); // Ссылка стабильна
+  return <div>{count}</div>;
+};
+```
+
+### Финальный результат
+
+Мы написали свой мини-Redux всего за пару минут. Вот полный код, готовый к использованию:
+
+```js
+import React, { useSyncExternalStore, useCallback } from "react";
+
+// 1. Создаем стор (Vanilla JS)
+export function createStore(initialState) {
+  let state = initialState;
+  const listeners = new Set();
+
+  return {
+    getState: () => state,
+    setState: (newState) => {
+      state = { ...state, ...newState };
+      listeners.forEach((l) => l(state));
+    },
+    subscribe: (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+}
+
+// 2. Создаем React-хук
+export function useStore(store, selector) {
+  return useSyncExternalStore(
+    store.subscribe,
+    useCallback(() => selector(store.getState()), [store, selector])
+  );
+}
+```
+
+**Использование:**
+
+```js
+const myStore = createStore({ count: 0, user: "Vertex" });
+const selectCount = (state) => state.count;
+
+function App() {
+  const count = useStore(myStore, selectCount);
+
+  return (
+    <button onClick={() => myStore.setState({ count: count + 1 })}>
+      Count: {count}
+    </button>
+  );
+}
+```
+
+Поздравляю! Теперь вы не просто пользователь библиотек, вы понимаете их архитектуру. В следующий раз, когда будете дебажить Zustand или Redux, вы будете точно знать, куда смотреть.

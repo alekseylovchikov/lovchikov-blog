@@ -3,47 +3,243 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { PROFILE } from '../data/profile';
+
+const pageTitle = `${PROFILE.displayName} — ${PROFILE.role}`;
+const pageDescription =
+	PROFILE.tagline?.trim().length ? PROFILE.tagline : SITE_DESCRIPTION;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={pageTitle} description={pageDescription} />
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+			<section class="hero" aria-labelledby="intro-title">
+				<div class="hero__content">
+					<p class="kicker">{SITE_TITLE}</p>
+					<h1 id="intro-title">{PROFILE.displayName}</h1>
+					<p class="role">{PROFILE.role}</p>
+					<p class="tagline">{PROFILE.tagline}</p>
+					<div class="actions" role="group" aria-label="Основные действия">
+						<a class="button" href="/blog">Blog</a>
+						<a class="button button--ghost" href="/about">About</a>
+					</div>
+					{PROFILE.links?.length ? (
+						<ul class="links" aria-label="Ссылки">
+							{PROFILE.links.map((l) => (
+								<li><a href={l.href}>{l.label}</a></li>
+							))}
+						</ul>
+					) : (
+						<p class="hint">
+							Контакты можно добавить в <code>src/data/profile.ts</code> (поле <code>links</code>).
+						</p>
+					)}
+				</div>
+			</section>
+
+			<section class="grid">
+				<section class="card" aria-labelledby="about-title">
+					<h2 id="about-title">Обо мне</h2>
+					<p>
+						Я строю веб‑сервисы и интерфейсы, в которых приятно разбираться: понятная архитектура,
+						воспроизводимые сборки, аккуратные API и человеческие тексты.
+					</p>
+					<p class="muted">
+						Фокус: скорость загрузки, стабильность, доступность (a11y), предсказуемость разработки.
+					</p>
+				</section>
+
+				<section class="card" aria-labelledby="focus-title">
+					<h2 id="focus-title">Что я делаю</h2>
+					<ul class="list">
+						{PROFILE.focus.map((item) => (
+							<li>{item}</li>
+						))}
+					</ul>
+				</section>
+			</section>
+
+			<section class="card" aria-labelledby="stack-title">
+				<h2 id="stack-title">Стек</h2>
+				<div class="stack">
+					<div class="stack__group">
+						<h3>Основа</h3>
+						<ul class="chips">{PROFILE.stack.core.map((s) => <li>{s}</li>)}</ul>
+					</div>
+					<div class="stack__group">
+						<h3>Фронтенд</h3>
+						<ul class="chips">{PROFILE.stack.frontend.map((s) => <li>{s}</li>)}</ul>
+					</div>
+					<div class="stack__group">
+						<h3>Бэкенд</h3>
+						<ul class="chips">{PROFILE.stack.backend.map((s) => <li>{s}</li>)}</ul>
+					</div>
+					<div class="stack__group">
+						<h3>Качество</h3>
+						<ul class="chips">{PROFILE.stack.quality.map((s) => <li>{s}</li>)}</ul>
+					</div>
+				</div>
+			</section>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	:global(:root) {
+		/* Монохромная подача на главной: без “синего акцента” */
+		--accent: #000;
+		--accent-dark: #000;
+	}
+
+	.hero {
+		margin: 0 0 2rem 0;
+		border: 1px solid rgba(var(--black), 14%);
+		border-radius: 14px;
+		background: #fff;
+		box-shadow: 0 8px 30px rgba(var(--black), 6%);
+	}
+
+	.hero__content {
+		padding: 2rem 1.25rem;
+	}
+
+	.kicker {
+		margin: 0 0 0.5rem 0;
+		color: rgba(var(--gray), 85%);
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		font-size: 0.85rem;
+	}
+
+	.role {
+		margin: 0.25rem 0 0.75rem 0;
+		color: rgba(var(--gray-dark), 92%);
+		font-weight: 600;
+	}
+
+	.tagline {
+		margin: 0 0 1.25rem 0;
+		max-width: 62ch;
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin: 0 0 1rem 0;
+	}
+
+	.button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.65rem 0.95rem;
+		border-radius: 999px;
+		border: 1px solid rgba(var(--black), 18%);
+		background: #000;
+		color: #fff;
+		text-decoration: none;
+		font-weight: 600;
+		line-height: 1;
+	}
+
+	.button:hover {
+		filter: brightness(1.08);
+	}
+
+	.button--ghost {
+		background: transparent;
+		color: #000;
+	}
+
+	.links {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem 1rem;
+	}
+
+	.links a {
+		color: #000;
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+
+	.hint {
+		margin: 0.75rem 0 0 0;
+		color: rgba(var(--gray), 95%);
+		font-size: 0.95rem;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin: 0 0 1rem 0;
+	}
+
+	.card {
+		border: 1px solid rgba(var(--black), 10%);
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.9);
+		padding: 1.25rem;
+	}
+
+	.muted {
+		color: rgba(var(--gray), 95%);
+	}
+
+	.list {
+		margin: 0.75rem 0 0 0;
+		padding-left: 1.25rem;
+	}
+
+	.stack {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+	}
+
+	.stack__group h3 {
+		font-size: 1.1rem;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.chips {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.chips li {
+		border: 1px solid rgba(var(--black), 14%);
+		border-radius: 999px;
+		padding: 0.35rem 0.6rem;
+		font-size: 0.95rem;
+		background: #fff;
+	}
+
+	@media (max-width: 720px) {
+		.grid {
+			grid-template-columns: 1fr;
+		}
+		.stack {
+			grid-template-columns: 1fr;
+		}
+		.hero__content {
+			padding: 1.25rem;
+		}
+	}
+</style>
