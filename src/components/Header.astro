@@ -19,10 +19,10 @@ import ThemeToggle from './ThemeToggle.astro';
 </header>
 <style>
 	header {
-		margin: 0;
-		padding: 0 1em;
 		background: var(--bg-body);
-		/* box-shadow: 0 2px 8px rgba(var(--black), 5%); */
+		display: flex;
+		align-items: center;
+		padding: 0 1rem;
 	}
 	h2 {
 		margin: 0;
@@ -37,6 +37,8 @@ import ThemeToggle from './ThemeToggle.astro';
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		flex: 1;
+		flex-wrap: wrap;
 	}
 	nav a {
 		padding: 1em 0.5em;
@@ -48,6 +50,9 @@ import ThemeToggle from './ThemeToggle.astro';
 		text-decoration: none;
 		border-bottom-color: var(--accent);
 	}
+	.logo {
+		padding: 1em 0.5em;
+	}
 	.social-links,
 	.social-links a {
 		display: flex;
@@ -55,6 +60,11 @@ import ThemeToggle from './ThemeToggle.astro';
 	@media (max-width: 720px) {
 		.social-links {
 			display: none;
+		}
+	}
+	@media (max-width: 470px) {
+		.header-nav {
+			flex-direction: column;
 		}
 	}
 </style>
