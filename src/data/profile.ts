@@ -20,35 +20,47 @@ export type Profile = {
 
 export const PROFILE: Profile = {
   displayName: "Aleksei Lovchikov",
-  role: "Full‑stack разработчик",
+  role: "Full-stack разработчик",
   tagline:
-    "Делаю быстрые, доступные и аккуратно спроектированные веб‑продукты: от идеи и архитектуры до релиза и поддержки.",
+    "Frontend-разработчик с 8-летним опытом. Создаю продуманные и быстрые интерфейсы на React и TypeScript, развиваюсь в бэкенде и геймдеве. Строю архитектуру, оптимизирую процессы и довожу продукты до результата.",
   location: "Cyprus",
+
   focus: [
-    "Продуктовая разработка: чёткие требования → предсказуемые релизы",
-    "Производительность и UX: быстрый рендер, понятные состояния, без “магии”",
-    "Инженерная дисциплина: типизация, тесты, ревью, документация",
+    "Продуктовая разработка: от проработки требований до стабильных релизов",
+    "Производительность и UX: быстрый рендер, предсказуемые состояния, ясные интерфейсы",
+    "Инженерная дисциплина: типизация, тесты, код-ревью, документация",
     "Интеграции и автоматизация: API, пайплайны, CI/CD",
+    "Архитектура фронтенда: дизайн-системы, FSD, SSR, оптимизация бандла",
+    "Рост в бэкенде и системном дизайне: ответственность за фичу end-to-end",
+    "Геймдев: практика на Unity (C#) и Rust/Bevy, работа с рендером и производительностью",
   ],
+
   stack: {
     core: ["TypeScript", "Node.js", "HTML", "CSS"],
     frontend: [
+      "React",
       "Astro",
       "Vite",
       "SSR/SSG",
-      "React",
-      "Vite",
       "TailwindCSS",
       "Shadcn/UI",
+      "Puppeteer",
+      "Playwright / Vitest",
     ],
-    backend: ["REST", "GraphQL", "PostgreSQL", "Redis", "Rust"],
-    quality: ["Тестирование", "Code review"],
+    backend: [
+      "Node.js",
+      "REST",
+      "GraphQL",
+      "PostgreSQL",
+      "Redis",
+      "Docker",
+      "Rust",
+    ],
+    quality: ["Юнит-тесты", "E2E-тесты", "Code review", "Линтинг", "CI"],
   },
+
   links: [
-    {
-      label: "GitHub",
-      href: "https://github.com/alekseylovchikov",
-    },
+    { label: "GitHub", href: "https://github.com/alekseylovchikov" },
     {
       label: "LinkedIn",
       href: "https://www.linkedin.com/in/aleksei-lovchikov/",
