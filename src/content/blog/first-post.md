@@ -2,7 +2,7 @@
 title: "Пишем свой Redux"
 description: "разбираем магию стейт-менеджеров"
 pubDate: "Dec 12 2025"
-heroImage: "../../assets/blog-placeholder-3.jpg"
+heroImage: "../../assets/redux.jpeg"
 ---
 
 Мы все привыкли использовать готовые инструменты: Redux Toolkit, Zustand, MobX. Мы пишем useStore, и магия происходит сама собой: данные обновляются, компоненты перерисовываются. Но что на самом деле происходит внутри этого «черного ящика»?
